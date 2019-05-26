@@ -50,6 +50,12 @@ public class Plot2DCanvas extends PlotCanvas {
 		ActionMode = editable;
 	}
 
+	public Plot2DCanvas(double[] min, double[] max,int editable,Plot2DPanel panel) {
+		super(min, max);
+		this.panel = panel;
+		ActionMode = editable;
+	}
+
 	public Plot2DCanvas(double[] min, double[] max, String[] axesScales, String[] axesLabels) {
 		super(min, max, axesScales, axesLabels);
 		ActionMode = ZOOM;

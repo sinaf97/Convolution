@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 /**
  * EditableGraph is a JFrame in which we can draw our own signal as input signals
  */
@@ -12,6 +13,7 @@ import java.awt.event.ActionListener;
 public class EditableGraph extends JFrame {
     private InputDataUI input;
     private boolean sina;
+    private String colorOfInterest;
 
 
     public EditableGraph(InputDataUI input,boolean sina){  //Constructor
@@ -23,21 +25,25 @@ public class EditableGraph extends JFrame {
         else
             setTitle("Signal H");
         this.setLayout(new BorderLayout());
-        MyPanel graph = new MyPanel();
+        MyPanel graph = new MyPanel(input.main.result);
         JPanel footer = new JPanel();
+        JLabel l1 = new JLabel("Color: ");
+        String[] colors = { "Blue", "Red", "Green", "Black", "Yellow" };
+        JComboBox color = new JComboBox(colors);
         JButton confirm = new JButton("Confirm");
         JButton reset = new JButton("Reset");
         JButton close = new JButton("Close");
         confirm.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                colorOfInterest = (String) color.getSelectedItem();
                 if(sina) {
                     input.setX(graph.panel.plotCanvas.getMouseMovement());
-                    input.main.setXDatas(graph.panel.plotCanvas.getMouseMovement());
+                    input.main.setXDatas(graph.panel.plotCanvas.getMouseMovement(),colorOfInterest);
                 }
                 else{
                     input.setH(graph.panel.plotCanvas.getMouseMovement());
-                    input.main.setHDatas(graph.panel.plotCanvas.getMouseMovement());
+                    input.main.setHDatas(graph.panel.plotCanvas.getMouseMovement(),colorOfInterest);
                 }
                 setVisible(true);
             }
@@ -56,6 +62,8 @@ public class EditableGraph extends JFrame {
                 setVisible(false);
             }
         });
+        footer.add(l1);
+        footer.add(color);
         footer.add(confirm);
         footer.add(reset);
         footer.add(close);

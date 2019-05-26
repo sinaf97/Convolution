@@ -15,6 +15,7 @@ public class SinInfoUI extends JFrame {
     public double omega;
     public double step;
     private InputDataUI self;
+    private String colorOfInterest;
 
     /**
      * Constructor
@@ -28,16 +29,19 @@ public class SinInfoUI extends JFrame {
         setTitle("Rectangle function variable-set");
         setSize(300,150);
         setResizable(false);
-        setLayout(new GridLayout(5,2));
+        setLayout(new GridLayout(6,2));
 
         JLabel l1 = new JLabel("Start point:");
         JLabel l2 = new JLabel("End point:");
         JLabel l3 = new JLabel("Omega:");
         JLabel l4 = new JLabel("Step:");
+        JLabel l5 = new JLabel("Color:");
         JTextField t1 = new JTextField("-5");
         JTextField t2 = new JTextField("5");
         JTextField t3 = new JTextField("1");
         JTextField t4 = new JTextField("0.01");
+        String[] colors = { "Blue", "Red", "Green", "Black", "Yellow" };
+        JComboBox color = new JComboBox(colors);
         JButton confirm = new JButton("Confirm");
         JButton close = new JButton("Close");
         add(l1);
@@ -48,6 +52,8 @@ public class SinInfoUI extends JFrame {
         add(t3);
         add(l4);
         add(t4);
+        add(l5);
+        add(color);
 
         confirm.addActionListener(new ActionListener(){
             @Override
@@ -56,6 +62,7 @@ public class SinInfoUI extends JFrame {
                 end = Double.valueOf(t2.getText());
                 omega = Double.valueOf(t3.getText());
                 step = Double.valueOf(t4.getText());
+                colorOfInterest = (String) color.getSelectedItem();
                 LinkedHashMap<Double,Double> data;
                 if(sin) {
                     data = self.getSin(start,end,omega,step);
@@ -63,9 +70,9 @@ public class SinInfoUI extends JFrame {
                     data = self.getCos(start,end,omega,step);
                 }
                 if (sina) {
-                    self.main.setXDatas(data);
+                    self.main.setXDatas(data,colorOfInterest);
                 } else {
-                    self.main.setHDatas(data);
+                    self.main.setHDatas(data,colorOfInterest);
                 }
                 setVisible(true);
             }

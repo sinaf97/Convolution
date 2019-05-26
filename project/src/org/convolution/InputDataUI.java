@@ -15,8 +15,8 @@ import java.util.LinkedHashMap;
  */
 public class InputDataUI extends JPanel {
     public ConvolutionUI main;
-    private Plot2DPanel xt;
-    private Plot2DPanel ht;
+    public Plot2DPanel xt;
+    public Plot2DPanel ht;
     private InputDataUI self = this;
 
 
@@ -46,7 +46,10 @@ public class InputDataUI extends JPanel {
     public void setH(LinkedHashMap<Double,Double> h){
         Points points = new Points(h);
         this.ht.removeAllPlots();
-        this.ht.addLinePlot("Signal h",points.getX(),points.getY());
+        if(!main.descrete)
+            this.ht.addLinePlot("Signal h",points.getX(),points.getY());
+        else
+            this.ht.addBarPlot("Signal h",points.getX(),points.getY());
         this.ht.addLegend("NORTH");
         this.ht.changePlotColor(0,Color.GREEN);
 
@@ -60,7 +63,10 @@ public class InputDataUI extends JPanel {
     public void setX(LinkedHashMap<Double,Double> x){
         Points points = new Points(x);
         this.xt.removeAllPlots();
-        this.xt.addLinePlot("Signal x",points.getX(),points.getY());
+        if(!main.descrete)
+            this.xt.addLinePlot("Signal x",points.getX(),points.getY());
+        else
+            this.xt.addBarPlot("Signal x",points.getX(),points.getY());
         this.xt.addLegend("NORTH");
         this.xt.changePlotColor(0,Color.RED);
     }

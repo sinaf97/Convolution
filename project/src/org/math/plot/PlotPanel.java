@@ -404,6 +404,9 @@ public abstract class PlotPanel extends JPanel {
     public void changePlotColor(int I, Color c) {
         plotCanvas.changePlotColor(I, c);
     }
+    public Color getPlotColor(int I) {
+        return plotCanvas.getPlotColor(I);
+    }
 
     public void removePlot(int I) {
         plotCanvas.removePlot(I);

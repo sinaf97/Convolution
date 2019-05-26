@@ -5,6 +5,6 @@ import org.convolution.ConvolutionUI;
  */
 public class Main {
     public static void main(String[] args){
-        new ConvolutionUI();
+        new ConvolutionUI(false);
     }
 }

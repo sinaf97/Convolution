@@ -31,38 +31,34 @@ public class Plot2DPanel extends PlotPanel {
      */
     public Plot2DPanel() {
         super(new Plot2DCanvas());
-        this.plotCanvas.sinaSetPanel(this);
     }
 
     public Plot2DPanel(Color c) {
         super(new Plot2DCanvas(c));
-        this.plotCanvas.sinaSetPanel(this);
     }
 
     public Plot2DPanel(double[] min, double[] max) {
         super(new Plot2DCanvas(min, max));
-        this.plotCanvas.sinaSetPanel(this);
     }
 
     public Plot2DPanel(double[] min, double[] max,int editable) {
         super(new Plot2DCanvas(min, max,editable));
-        this.plotCanvas.sinaSetPanel(this);
+        this.plotCanvas.sinaSetpanel(this);
     }
 
     public Plot2DPanel(int editable,ResultUI result) {
         super(new Plot2DCanvas(editable));
-        this.plotCanvas.sinaSetPanel(this);
     }
 
     public Plot2DPanel(double[] min, double[] max, int editable, ResultUI result) {
         super(new Plot2DCanvas(min, max,editable));
-        this.plotCanvas.sinaSetPanel(this);
+        this.plotCanvas.sinaSetpanel(this);
+        this.plotCanvas.sinaSetResult(result);
         this.result = result;
     }
 
     public Plot2DPanel(double[] min, double[] max, String[] axesScales, String[] axesLabels) {
         super(new Plot2DCanvas(min, max, axesScales, axesLabels));
-        this.plotCanvas.sinaSetPanel(this);
     }
     
     public Plot2DPanel(PlotCanvas _canvas, String legendOrientation) {

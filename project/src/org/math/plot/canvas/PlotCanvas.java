@@ -2,8 +2,8 @@ package org.math.plot.canvas;
 
 import java.awt.*;
 
-import com.sun.jdi.connect.spi.Connection;
 import org.convolution.Convolution;
+import org.convolution.ResultUI;
 import org.math.plot.Plot2DPanel;
 import org.math.plot.render.AWTDrawer;
 import org.math.plot.utils.FastMath;
@@ -54,7 +54,8 @@ public abstract class PlotCanvas extends JPanel implements MouseListener, MouseM
     public LegendPanel linkedLegendPanel;
     public LinkedList<Plot> plots;
     public LinkedList<Plotable> objects;
-    private Plot2DPanel panel;
+    private ResultUI result1;
+    public Plot2DPanel panel;
 
 
     // ///////////////////////////////////////////
@@ -90,9 +91,11 @@ public abstract class PlotCanvas extends JPanel implements MouseListener, MouseM
         initBasenGrid(min, max, axesScales, axesLabels);
         initDrawer();
     }
-
-    public void sinaSetPanel(Plot2DPanel panel){
+    public void sinaSetpanel(Plot2DPanel panel){
         this.panel = panel;
+    }
+    public void sinaSetResult(ResultUI result){
+        this.result1 = result;
     }
 
     @Override
@@ -408,6 +411,10 @@ public abstract class PlotCanvas extends JPanel implements MouseListener, MouseM
             linkedLegendPanel.updateLegends();
         }
         repaint();
+    }
+
+    public Color getPlotColor(int I) {
+        return getPlot(I).getColor();
     }
 
     public void removePlot(int I) {
@@ -745,10 +752,12 @@ public abstract class PlotCanvas extends JPanel implements MouseListener, MouseM
             case EDITABLE:
 //                this.mouseMovement.put((x_axis + (double) e.getX()) / scale, (y_axis - (double) e.getY()) / scale);
 //                update(mouseMovement);
+                mousePrev[0] = e.getX();
+                mousePrev[1] = e.getY();
                 e.consume();
                 break;
             case DRAGABLE:
-                result = Convolution.calculate(panel.result.x,panel.result.h);
+                result = Convolution.calculate(result1.x,result1.h);
                 mousePrev[0] = e.getX();
                 mousePrev[1] = e.getY();
                 break;
@@ -775,9 +784,18 @@ public abstract class PlotCanvas extends JPanel implements MouseListener, MouseM
         e.consume();
         switch (ActionMode) {
             case EDITABLE:
-                double bound = 1/scale/0.01;
-                for(int i = 0; i< bound;i++)
-                    this.mouseMovement.put((x_axis + (double) e.getX()/scale)+i*0.01,(y_axis-(double) e.getY())/scale);
+                if(!result1.main.descrete) {
+                    double bound = 1 / scale / 0.01;
+                    for (int i = 0; i < bound; i++)
+                        this.mouseMovement.put((x_axis + (double) e.getX() / scale) + i * 0.01, (y_axis - (double) e.getY()) / scale);
+                }
+                else {
+                    if(isInteger(x_axis + (double) e.getX() / scale)) {
+                        this.mouseMovement.put((x_axis + (double) e.getX() / scale), (y_axis - (double) e.getY()) / scale);
+                        mousePrev[0] = mouseCurent[0];
+                        mousePrev[1] = mouseCurent[1];
+                    }
+                }
                 update(mouseMovement);
                 e.consume();
                 repaint();
@@ -821,6 +839,9 @@ public abstract class PlotCanvas extends JPanel implements MouseListener, MouseM
         return result;
 
     }
+    private boolean isInteger(double num){
+        return (num-(int)num==0)?true:false;
+    }
 
     public void mouseReleased(MouseEvent e) {
         //System.out.println("PlotCanvas.mouseReleased");
@@ -839,8 +860,8 @@ public abstract class PlotCanvas extends JPanel implements MouseListener, MouseM
         e.consume();
         switch (ActionMode) {
             case EDITABLE:
-                this.mouseMovement.put((x_axis + (double) e.getX()/scale),(y_axis-(double) e.getY())/scale);
-                update(mouseMovement);
+//                this.mouseMovement.put((x_axis + (double) e.getX()/scale),(y_axis-(double) e.getY())/scale);
+//                update(mouseMovement);
                 e.consume();
                 break;
             case ZOOM:
@@ -873,8 +894,8 @@ public abstract class PlotCanvas extends JPanel implements MouseListener, MouseM
 
         switch (ActionMode) {
             case EDITABLE:
-                this.mouseMovement.put((x_axis + (double) e.getX())/100.0,(y_axis-(double) e.getY())/100.0);
-                update(mouseMovement);
+//                this.mouseMovement.put((x_axis + (double) e.getX())/100.0,(y_axis-(double) e.getY())/100.0);
+//                update(mouseMovement);
                 e.consume();
                 break;
             case ZOOM:
@@ -942,25 +963,59 @@ public abstract class PlotCanvas extends JPanel implements MouseListener, MouseM
         double[] max = {10,10};
         Points data = new Points(mouseMovement);
         this.panel.removeAllPlots();
-        this.panel.addLinePlot("updated",data.getX(),data.getY());
+        if(!result1.main.descrete)
+            this.panel.addLinePlot("Custom",data.getX(),data.getY());
+        else
+            this.panel.addBarPlot("Custom",data.getX(),data.getY());
         this.panel.setFixedBounds(min,max);
     }
 
     public void updatePart(LinkedHashMap<Double,Double> mouseMovement){
+        double[] min = {-10,-5};
+        double[] max = {10,5};
+        Color c1 = new Color(1);
+        Color c2 = new Color(1);
+        Color c3 = new Color(1);
+        try{
+            c1 = this.result1.result.getPlotColor(0);
+        }catch(Exception e){}
+        try{
+            c2 = this.result1.result.getPlotColor(1);
+        }catch(Exception e){}
+        try{
+            c3 = this.result1.result2.getPlotColor(0);
+        }catch(Exception e){}
         Points data;
-        this.panel.removeAllPlots();
-        data = new Points(this.panel.result.x);
-        this.panel.addLinePlot("Signal x",data.getX(),data.getY());
-        data = new Points(Convolution.reverse(mouseMovement2));
-        this.panel.addLinePlot("updated",data.getX(),data.getY());
-        data = new Points(Convolution.calculatePart(result,mouseMovement));
-        this.panel.addLinePlot("Result",data.getX(),data.getY());
+        this.result1.result.removeAllPlots();
+        this.result1.result2.removeAllPlots();
+        data = new Points(this.result1.result.result.x);
+        if(!result1.main.descrete) {
+            this.result1.result.addLinePlot("Signal x", data.getX(), data.getY());
+            data = new Points(Convolution.reverse(mouseMovement2));
+            this.result1.result.addLinePlot("Signal h", data.getX(), data.getY());
+            data = new Points(Convolution.calculatePart(result, mouseMovement));
+            this.result1.result2.addLinePlot("Result", data.getX(), data.getY());
+        }
+        else{
+            this.result1.result.addBarPlot("Signal x", data.getX(), data.getY());
+            data = new Points(Convolution.reverse(mouseMovement2));
+            this.result1.result.addBarPlot("Signal h", data.getX(), data.getY());
+            data = new Points(Convolution.calculatePart(result, mouseMovement));
+            this.result1.result2.addBarPlot("Result", data.getX(), data.getY());
+        }
+        this.result1.result.changePlotColor(0,c1);
+        this.result1.result.changePlotColor(1,c2);
+        this.result1.result2.changePlotColor(0,c3);
+        this.result1.result.setFixedBounds(min,max);
+        this.result1.result2.setFixedBounds(min,max);
+
 
     }
 
     public void reset(){
         mouseMovement.clear();
-        this.panel.removeAllPlots();
+        this.result1.result.removeAllPlots();
+        this.result1.result2.removeAllPlots();
     }
 
     public LinkedHashMap<Double, Double> getMouseMovement() {
